@@ -1,0 +1,8 @@
+
+INSERT INTO EventType VALUES (1, 'test', NULL);
+INSERT INTO Observer VALUES (1, 'obs', ROW(0,0,0)::POINT_COORDINATES);
+INSERT INTO SpaceObject VALUES 
+    (1, 'A', ROW(0,0,0)::POINT_COORDINATES, 'ASTEROID'),
+    (2, 'B', ROW(50,50,50)::POINT_COORDINATES, 'ASTEROID');
+INSERT INTO ObservationTarget VALUES (1, NULL, 1);
+INSERT INTO Observation VALUES (1, NOW(), 'test', 1, 1, 1);

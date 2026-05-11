@@ -1,0 +1,91 @@
+Table Observation {
+  ID bigserial [pk]
+  observation_time timestamp [default:`now()`]
+  observation_description text
+  observation_target_id bigint [not null]
+  observer_id bigint [not null]
+  event_type_id bigint [not null]
+}
+
+Table EventType {
+  event_type_id bigseial [pk]
+  name_type varchar(100)
+  description_event text
+}
+
+Table Observer {
+  observer_id bigserial [pk]
+  observer_description text
+  coordinates PointCoordinates [not null]
+}
+
+Table ObservationTarget {
+  observation_target_id bigserial [pk]
+  target_type enum
+  ship_id bigint [unique, ref: > SpaceShip.ship_id]  // unique!
+  object_id bigint [unique, ref: > SpaceObject.object_id] // unique!
+  
+  Indexes {
+    (ship_id) [unique]
+    (object_id) [unique]
+  }
+}
+
+Table SpaceShip {
+  ship_id bigserial [pk]
+  ship_name varchar(100) [not null]
+  engine_type enum
+  coordinate PointCoordinates [not null]
+  route_id bigint
+  start_time timestamp [default: `now()`]
+  end_time timestamp
+}
+
+Table Route {
+  route_id bigserial [pk]
+  coordinates_start PointCoordinates [not null]
+  coordinates_end PointCoordinates [not null]
+}
+
+Table SpaceObject {
+  object_id bigserial [pk]
+  object_name varchar(100)
+  coordinates PointCoordinates [not null]
+  object_type enum
+}
+
+Table Characteristic {
+  characteristic_id bigserial [pk] 
+  key varchar(100)
+  value varchar(100)
+}
+
+Table SpaceShipCharacteristic {
+  ship_id bigint
+  characteristic_id bigint
+
+  indexes {
+    (ship_id, characteristic_id) [pk]
+  }
+}
+
+Table SpaceObjectCharacteristic {
+  object_id bigint
+  characteristic_id bigint
+
+  indexes {
+    (object_id, characteristic_id) [pk]
+  }
+}
+
+Ref: SpaceShip.route_id > Route.route_id
+
+Ref: SpaceObjectCharacteristic.object_id > SpaceObject.object_id
+Ref: SpaceObjectCharacteristic.characteristic_id > Characteristic.characteristic_id
+
+Ref: SpaceShipCharacteristic.ship_id > SpaceShip.ship_id
+Ref: SpaceShipCharacteristic.characteristic_id > Characteristic.characteristic_id
+
+Ref: Observation.observation_target_id > ObservationTarget.observation_target_id
+Ref: Observation.observer_id > Observer.observer_id
+Ref: Observation.event_type_id > EventType.event_type_id
