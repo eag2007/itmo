@@ -1,0 +1,107 @@
+; 12-битовые числа, составить новый массив из 32-битовых по функции: f(x)=13x+1217
+
+ORG 0x30
+ADDRESS_RESULT: WORD    0x500
+ADDRESS_TMP:    WORD    0x40
+
+ORG 0x40
+MASSIVE:        WORD    1, 2, 3, 4, 5, 6
+
+ORG 0x50
+RESULT_TMP:     WORD    0x500
+TMP_LEFT:       WORD    0
+TMP_RIGHT:      WORD    0
+VALUE_LEFT:     WORD    0
+VALUE_RIGHT:    WORD    0
+COUNT:          WORD    0
+CONSTANT:       WORD    1217
+LEN_MASSIVE:    WORD    6
+MASK_AND:       WORD    0x0800
+MASK_OR_LEFT:   WORD    0xFFFF
+MASK_OR_RIGHT:  WORD    0xF000 
+
+ORG 0x60
+MAIN:
+    CALL CHECK_LEN
+    
+    LD (ADDRESS_TMP)+
+    ST TMP_RIGHT
+    CLA
+    ST TMP_LEFT
+    
+    CALL CHECK_MASK
+    
+    LD LEN_MASSIVE
+    DEC
+    ST LEN_MASSIVE
+    
+    CLA
+    ST TMP_LEFT
+    ST TMP_RIGHT
+    ST COUNT
+    
+    CALL PROCESS
+    
+    LD TMP_LEFT
+    ST (RESULT_TMP)+
+    LD TMP_RIGHT
+    ST (RESULT_TMP)+  
+    
+    JUMP MAIN
+
+PROCESS:
+    LD COUNT
+    INC
+    ST COUNT
+    CALL FUNCTION
+    LD COUNT
+    CMP #13
+    BEQ COUNT_13
+    JUMP PROCESS
+
+COUNT_13:
+    LD TMP_RIGHT
+    ADD CONSTANT
+    ST TMP_RIGHT
+    LD TMP_LEFT
+    ADC #0
+    ST TMP_LEFT
+    CLA
+    ST COUNT
+    RET
+
+FUNCTION:
+    LD TMP_RIGHT
+    ADD VALUE_RIGHT
+    ST TMP_RIGHT
+    LD TMP_LEFT
+    ADC VALUE_LEFT
+    ST TMP_LEFT
+    RET
+
+CHECK_MASK:
+    LD TMP_RIGHT
+    AND MASK_AND
+    BNE NEGATIVE
+    CLA
+    ST VALUE_LEFT
+    LD TMP_RIGHT
+    ST VALUE_RIGHT
+    RET
+
+NEGATIVE:
+    LD TMP_LEFT
+    OR MASK_OR_LEFT
+    ST VALUE_LEFT
+    LD TMP_RIGHT
+    OR MASK_OR_RIGHT
+    ST VALUE_RIGHT
+    RET
+
+CHECK_LEN:
+    LD LEN_MASSIVE
+    BEQ HALT
+    RET
+
+HALT:
+    HLT
